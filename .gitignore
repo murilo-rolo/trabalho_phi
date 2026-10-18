@@ -23,3 +23,9 @@ c5_pin_model_dump.txt
 work/
 *.vho
 *.sdo
+
+# ---------------------------------------------------------------------------
+# Simulação Questa — artefatos pesados regeneráveis (sim/questa/*.sh)
+# ---------------------------------------------------------------------------
+sim/questa/logs/*.vcd
+sim/questa/logs/*.wlf

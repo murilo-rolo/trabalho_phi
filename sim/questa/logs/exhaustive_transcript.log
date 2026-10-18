@@ -1,0 +1,72 @@
+Reading pref.tcl
+
+# 2025.2
+
+# ** Note: (vsim-220) 'modelsim.ini' is used as the ini file.
+# vsim -c -lib work tb_exhaustive -wlf /tmp/opencode/questa_mult_exh/dump.wlf -do "log -r /*; run -all; quit -f" 
+# Start time: 20:22:57 on Oct 18,2026
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Note: (vopt-220) 'modelsim.ini' is used as the ini file.
+# //  Questa Altera Starter FPGA Edition-64
+# //  Version 2025.2 linux_x86_64 May 31 2025
+# //
+# // Unpublished work. Copyright 2025 Siemens
+# //
+# // This material contains trade secrets or otherwise confidential information
+# // owned by Siemens Industry Software Inc. or its affiliates (collectively,
+# // "SISW"), or its licensors. Access to and use of this information is strictly
+# // limited as set forth in the Customer's applicable agreements with SISW.
+# //
+# // This material may not be copied, distributed, or otherwise disclosed outside
+# // of the Customer's facilities without the express written permission of SISW,
+# // and may not be used in any way not expressly authorized by SISW.
+# //
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_exhaustive(test)#1
+# Loading work.main(platformindependent)#1
+# log -r /*
+#  run -all
+# ** Note: === Inicio da simulacao exaustiva (256 pares) ===
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive
+# ** Warning: NUMERIC_STD."<": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive/DUT/BO/CMP_B_ZERO
+# ** Warning: NUMERIC_STD."<": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive/DUT/BO/CMP_B_ZERO
+# ** Warning: NUMERIC_STD.">": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive/DUT/BO/CMP_B_ZERO
+# ** Warning: NUMERIC_STD.">": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive/DUT/BO/CMP_B_ZERO
+# ** Warning: NUMERIC_STD."<": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive/DUT/BO/CMP_A_ZERO
+# ** Warning: NUMERIC_STD."<": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive/DUT/BO/CMP_A_ZERO
+# ** Warning: NUMERIC_STD.">": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive/DUT/BO/CMP_A_ZERO
+# ** Warning: NUMERIC_STD.">": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 0  Instance: /tb_exhaustive/DUT/BO/CMP_A_ZERO
+# ** Warning: NUMERIC_STD."<": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 1  Instance: /tb_exhaustive/DUT/BO/CMP_A_ZERO
+# ** Warning: NUMERIC_STD."<": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 1  Instance: /tb_exhaustive/DUT/BO/CMP_A_ZERO
+# ** Warning: NUMERIC_STD.">": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 1  Instance: /tb_exhaustive/DUT/BO/CMP_A_ZERO
+# ** Warning: NUMERIC_STD.">": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 1  Instance: /tb_exhaustive/DUT/BO/CMP_A_ZERO
+# ** Warning: NUMERIC_STD."<": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 1  Instance: /tb_exhaustive/DUT/BO/CMP_B_ZERO
+# ** Warning: NUMERIC_STD."<": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 1  Instance: /tb_exhaustive/DUT/BO/CMP_B_ZERO
+# ** Warning: NUMERIC_STD.">": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 1  Instance: /tb_exhaustive/DUT/BO/CMP_B_ZERO
+# ** Warning: NUMERIC_STD.">": metavalue detected, returning FALSE
+#    Time: 0 ns  Iteration: 1  Instance: /tb_exhaustive/DUT/BO/CMP_B_ZERO
+# ** Note: EXAUSTIVO TOTAL=256 FALHAS=0
+#    Time: 1054720 ns  Iteration: 0  Instance: /tb_exhaustive
+# ** Note: === Fim da simulacao exaustiva ===
+#    Time: 1054720 ns  Iteration: 0  Instance: /tb_exhaustive
+#  quit -f
+# End time: 20:23:00 on Oct 18,2026, Elapsed time: 0:00:03
+# Errors: 0, Warnings: 16

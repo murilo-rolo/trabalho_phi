@@ -125,7 +125,18 @@ datapath na de **subida**):
 ├── Multiplicador.sdc                   # Restrições de timing (clock de 50 MHz)
 ├── golden_top.v                        # Exemplo de pinout/IO standard (template Altera)
 ├── filelist.txt                        # Lista de arquivos do fluxo
-├── sim/                                # Testbench GHDL (tb_main.vhd, run_ghdl.sh, logs)
+├── sim/                                # Testbenches
+│   ├── tb_main.vhd                     # 5 vetores (GHDL e Questa)
+│   ├── tb_exhaustive.vhd               # Varredura exaustiva dos 256 pares 4×4
+│   ├── run_ghdl.sh                     # Fluxo de simulação com GHDL
+│   └── questa/                         # Fluxo de simulação com Questa
+│       ├── env.sh                      # Questa home + licença (SALT_LICENSE_SERVER)
+│       ├── run_questa.sh               # batch: tb_main → transcript + VCD
+│       ├── run_exhaustive.sh           # batch: 256 pares → resultados
+│       ├── render_wave.py              # VCD/transcript → PNGs (Pillow)
+│       ├── gui_wave.sh                 # screenshot da GUI do Questa (X11)
+│       ├── logs/                       # transcripts, VCD, WLF (gerados)
+│       └── img/                        # imagens de verificação (PNGs)
 ├── main/
 │   └── vhdl/
 │       ├── circuit/                    # main, bloco_ctr, bloco_op, log_comb  (o design)
@@ -188,6 +199,8 @@ Todas as análises fecham com slack positivo (antes da otimização o setup era
 
 ## Verificação funcional
 
+### GHDL
+
 Testbench em VHDL (`sim/tb_main.vhd`) executada com **GHDL**:
 
 ```bash
@@ -199,11 +212,58 @@ Vetores: `3×5=15`, `9×9=81`, `15×15=225`, `0×7=0`, `1×1=1` — todos passam
 `sim/checkpoint_clock_fix.log` documentam o estado anterior às correções
 (deadlock total no baseline; bug de extensão **com sinal** no checkpoint).
 
+### Questa (Intel FPGA Starter Edition 2025.2)
+
+Fluxo de simulação com o **Questa** incluído no Quartus 25.1
+(`/home/murilo/apps/altera_lite/25.1std/questa_fse`). Os caminhos e a variável
+de licença `SALT_LICENSE_SERVER` ficam em `sim/questa/env.sh`; o worklib é
+criado em `/tmp` porque o caminho do projeto tem acento.
+
+```bash
+./sim/questa/run_questa.sh        # tb_main (5 vetores): transcript + WLF/VCD
+./sim/questa/run_exhaustive.sh    # 256 pares 4×4 → exaustivo_results.txt
+python3 sim/questa/render_wave.py # gera as imagens em sim/questa/img/
+./sim/questa/gui_wave.sh          # abre a GUI, simula e tira screenshot (X11)
+```
+
+Resultados: **5/5 vetores** no `tb_main` e **256/256 pares** na varredura
+exaustiva (mesmos números obtidos com o GHDL). A multiplicação termina em
+poucas centenas de nanossegundos — o pior caso (`15×15`) fecha em ~34 ciclos
+de clock — e o produto fica estável até o próximo vetor.
+
+Resultados do `tb_main` (gerado a partir do transcript do Questa):
+
+![Resultados tb_main](sim/questa/img/resultados_tb_main.png)
+
+Waveform do vetor `3×5` (zoom da computação — `B` conta de 3 a 0, `P`
+acumula `entB` a cada ciclo e `mult` fica estável em `0F`):
+
+![Waveform 3x5](sim/questa/img/wave_3x5.png)
+
+Waveform do pior caso `15×15=225` (15 adições antes de `ab_0` encerrar a FSM):
+
+![Waveform 15x15](sim/questa/img/wave_15x15.png)
+
+Visão geral da execução completa do `tb_main` (5 vetores):
+
+![Waveform completa](sim/questa/img/wave_full_run.png)
+
+Varredura exaustiva — todos os 256 pares `entA × entB` (célula = valor lido
+em `mult` após a multiplicação):
+
+![Mapa exaustivo 256](sim/questa/img/mapa_256_exaustivo.png)
+
+Janela de waveform do Questa em execução (screenshot da GUI):
+
+![Questa GUI](sim/questa/img/questa_gui_waveform.png)
+
 ## Tecnologias
 
 - **Logisim(-Evolution)** — captura esquemática e exportação para VHDL
 - **VHDL** (IEEE 1076) — descrição do hardware
 - **Quartus Prime 25.1 Lite** — síntese, *fitting* e *place & route*
+- **Questa Intel FPGA Starter Edition 2025.2** — simulação (batch e GUI)
+- **GHDL** — simulação alternativa (regressão rápida)
 - **Cyclone V** `5CSXFC6D6F31C8ES` — FPGA alvo
 
 ## Créditos
