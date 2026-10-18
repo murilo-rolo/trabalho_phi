@@ -29,7 +29,7 @@ ARCHITECTURE platformIndependent OF bloco_ctr IS
       COMPONENT log_comb
          PORT ( ab_0              : IN  std_logic;
                 inicio            : IN  std_logic;
-                logisimClockTree0 : IN  std_logic_vector( 4 DOWNTO 0 );
+                clockTree         : IN  std_logic_vector( 4 DOWNTO 0 );
                 s_b_hab           : IN  std_logic;
                 s_inicio_out      : IN  std_logic;
                 b_hab             : OUT std_logic;
@@ -61,7 +61,7 @@ BEGIN
    MEMORY_1 : REGISTER_FLIP_FLOP
       GENERIC MAP ( invertClock => 1,
                     nrOfBits    => 3 )
-      PORT MAP ( clock       => logisimClockTree0(4),
+      PORT MAP ( clock       => clockTree(4),
                  clockEnable => '1',
                  d           => s_state_d,
                  q           => s_state_q,
@@ -78,7 +78,7 @@ BEGIN
                  b_hab             => s_state_d(1),
                  inicio            => inicio,
                  inicio_out        => s_state_d(0),
-                 logisimClockTree0 => logisimClockTree0,
+                 clockTree         => clockTree,
                  op_sel            => s_op_sel,
                  s_b_hab           => s_state_q(1),
                  s_inicio_out      => s_state_q(0) );

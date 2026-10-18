@@ -200,7 +200,7 @@ BEGIN
    REG_A : REGISTER_FLIP_FLOP
       GENERIC MAP ( invertClock => 0,
                     nrOfBits    => 4 )
-      PORT MAP ( clock       => logisimClockTree0(4),
+      PORT MAP ( clock       => clockTree(4),
                  clockEnable => inicio,
                  d           => entA,
                  q           => s_reg_a,
@@ -211,7 +211,7 @@ BEGIN
    REG_B : REGISTER_FLIP_FLOP
       GENERIC MAP ( invertClock => 0,
                     nrOfBits    => 4 )
-      PORT MAP ( clock       => logisimClockTree0(4),
+      PORT MAP ( clock       => clockTree(4),
                  clockEnable => s_en_b,
                  d           => s_reg_b_d,
                  q           => s_reg_b,
@@ -222,7 +222,7 @@ BEGIN
    REG_P : REGISTER_FLIP_FLOP
       GENERIC MAP ( invertClock => 0,
                     nrOfBits    => 8 )
-      PORT MAP ( clock       => logisimClockTree0(4),
+      PORT MAP ( clock       => clockTree(4),
                  clockEnable => s_en_p,
                  d           => s_sum_to_p,
                  q           => s_reg_p,

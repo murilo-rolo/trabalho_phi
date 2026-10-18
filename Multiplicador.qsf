@@ -518,12 +518,6 @@ set_global_assignment -name VHDL_FILE main/vhdl/arith/Adder_behavior.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/arith/Adder_entity.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/arith/Comparator_behavior.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/arith/Comparator_entity.vhd
-set_global_assignment -name VHDL_FILE main/vhdl/base/LogisimClockComponent_behavior.vhd
-set_global_assignment -name VHDL_FILE main/vhdl/base/LogisimClockComponent_entity.vhd
-set_global_assignment -name VHDL_FILE main/vhdl/base/logisimTickGenerator_behavior.vhd
-set_global_assignment -name VHDL_FILE main/vhdl/base/logisimTickGenerator_entity.vhd
-set_global_assignment -name VHDL_FILE main/vhdl/base/synthesizedClockGenerator_behavior.vhd
-set_global_assignment -name VHDL_FILE main/vhdl/base/synthesizedClockGenerator_entity.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/circuit/bloco_ctr_behavior.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/circuit/bloco_ctr_entity.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/circuit/bloco_op_behavior.vhd
@@ -544,8 +538,6 @@ set_global_assignment -name VHDL_FILE main/vhdl/plexers/Demultiplexer_bus_2_beha
 set_global_assignment -name VHDL_FILE main/vhdl/plexers/Demultiplexer_bus_2_entity.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/plexers/Multiplexer_bus_2_behavior.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/plexers/Multiplexer_bus_2_entity.vhd
-set_global_assignment -name VHDL_FILE main/vhdl/toplevel/logisimTopLevelShell_behavior.vhd
-set_global_assignment -name VHDL_FILE main/vhdl/toplevel/logisimTopLevelShell_entity.vhd
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top

@@ -18,8 +18,8 @@ ARCHITECTURE test OF tb_main IS
       PORT ( entA                : IN  std_logic_vector( 3 DOWNTO 0 );
              entB                : IN  std_logic_vector( 3 DOWNTO 0 );
              inicio              : IN  std_logic;
-             logisimClockTree0   : IN  std_logic_vector( 4 DOWNTO 0 );
-             logisimInputBubbles : IN  std_logic_vector( 0 DOWNTO 0 );
+             clockTree           : IN  std_logic_vector( 4 DOWNTO 0 );
+             reset               : IN  std_logic_vector( 0 DOWNTO 0 );
              mult                : OUT std_logic_vector( 7 DOWNTO 0 ) );
    END COMPONENT;
 
@@ -30,8 +30,8 @@ ARCHITECTURE test OF tb_main IS
    SIGNAL entB              : std_logic_vector( 3 DOWNTO 0 ) := (OTHERS => '0');
    SIGNAL inicio            : std_logic := '0';
    SIGNAL reset             : std_logic := '0';
-   SIGNAL logisimClockTree0 : std_logic_vector( 4 DOWNTO 0 );
-   SIGNAL bubbles           : std_logic_vector( 0 DOWNTO 0 );
+   SIGNAL reset_vec         : std_logic_vector( 0 DOWNTO 0 );
+   SIGNAL clockTree         : std_logic_vector( 4 DOWNTO 0 );
    SIGNAL mult              : std_logic_vector( 7 DOWNTO 0 );
    SIGNAL sim_done          : boolean   := false;
 
@@ -41,15 +41,15 @@ BEGIN
 
    -- bit 4: clock (unico sinal necessario apos a correcao de tick/borda);
    -- demais bits desligados, como no cenario real de fiação na placa
-   logisimClockTree0 <= clk & "0000";
-   bubbles(0)        <= reset;
+   clockTree    <= clk & "0000";
+   reset_vec(0) <= reset;
 
    DUT : main
       PORT MAP ( entA                => entA,
                  entB                => entB,
                  inicio              => inicio,
-                 logisimClockTree0   => logisimClockTree0,
-                 logisimInputBubbles => bubbles,
+                 clockTree           => clockTree,
+                 reset               => reset_vec,
                  mult                => mult );
 
    stimulus : PROCESS

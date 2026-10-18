@@ -17,7 +17,7 @@ ARCHITECTURE platformIndependent OF main IS
          PORT ( ab_0              : IN  std_logic;
                 clk               : IN  std_logic;
                 inicio            : IN  std_logic;
-                logisimClockTree0 : IN  std_logic_vector( 4 DOWNTO 0 );
+                clockTree         : IN  std_logic_vector( 4 DOWNTO 0 );
                 reset             : IN  std_logic;
                 b_hab             : OUT std_logic;
                 inicio_out        : OUT std_logic;
@@ -30,7 +30,7 @@ ARCHITECTURE platformIndependent OF main IS
                 entA              : IN  std_logic_vector( 3 DOWNTO 0 );
                 entB              : IN  std_logic_vector( 3 DOWNTO 0 );
                 inicio            : IN  std_logic;
-                logisimClockTree0 : IN  std_logic_vector( 4 DOWNTO 0 );
+                clockTree         : IN  std_logic_vector( 4 DOWNTO 0 );
                 op_sel            : IN  std_logic;
                 reset             : IN  std_logic;
                 ab_0              : OUT std_logic;
@@ -62,7 +62,7 @@ BEGIN
    --------------------------------------------------------------------------------
 
    -- Botao: reset
-   s_reset_btn <= logisimInputBubbles(0);
+   s_reset_btn <= reset(0);
 
    -- Cruzamento intencional das entradas (a multiplicacao e comutativa, mas a
    -- contagem decrescente do registrador B deve acompanhar o multiplicador):
@@ -76,11 +76,11 @@ BEGIN
    -- datapath) ocorra antes de a FSM amostrar ab_0 (borda de descida) --
    -- sem isso, o estado registra ab_0=1 com os operandos ainda zerados e
    -- a maquina trava. O valor inicial '1' protege tambem o power-up do FPGA.
-   reset_sync : PROCESS(logisimClockTree0(4), s_reset_btn) IS
+   reset_sync : PROCESS(clockTree(4), s_reset_btn) IS
    BEGIN
       IF (s_reset_btn = '1') THEN
          s_reset_int <= '1';
-      ELSIF falling_edge(logisimClockTree0(4)) THEN
+      ELSIF falling_edge(clockTree(4)) THEN
          s_reset_int <= '0';
       END IF;
    END PROCESS reset_sync;
@@ -92,10 +92,10 @@ BEGIN
    BC : bloco_ctr
       PORT MAP ( ab_0              => s_ab_0,
                  b_hab             => s_b_hab,
-                 clk               => logisimClockTree0(0),
+                 clk               => clockTree(0),
                  inicio            => inicio,
                  inicio_out        => s_inicio_out,
-                 logisimClockTree0 => logisimClockTree0,
+                 clockTree         => clockTree,
                  op_sel            => s_op_sel,
                  reset             => s_reset_int );
 
@@ -107,11 +107,11 @@ BEGIN
    BO : bloco_op
       PORT MAP ( ab_0              => s_ab_0,
                  b_hab             => s_b_hab,
-                 clk               => logisimClockTree0(0),
+                 clk               => clockTree(0),
                  entA              => s_multiplicando,
                  entB              => s_multiplicador,
                  inicio            => s_inicio_out,
-                 logisimClockTree0 => logisimClockTree0,
+                 clockTree         => clockTree,
                  op_sel            => s_op_sel,
                  reset             => s_reset_btn,
                  resultado         => s_resultado );

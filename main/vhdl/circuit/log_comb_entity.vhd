@@ -12,7 +12,7 @@ USE ieee.numeric_std.all;
 ENTITY log_comb IS
    PORT ( ab_0              : IN  std_logic;
           inicio            : IN  std_logic;
-          logisimClockTree0 : IN  std_logic_vector( 4 DOWNTO 0 );
+          clockTree         : IN  std_logic_vector( 4 DOWNTO 0 );
           s_b_hab           : IN  std_logic;
           s_inicio_out      : IN  std_logic;
           b_hab             : OUT std_logic;

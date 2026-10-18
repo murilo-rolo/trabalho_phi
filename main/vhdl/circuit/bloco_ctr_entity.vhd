@@ -13,7 +13,7 @@ ENTITY bloco_ctr IS
    PORT ( ab_0              : IN  std_logic;
           clk               : IN  std_logic;
           inicio            : IN  std_logic;
-          logisimClockTree0 : IN  std_logic_vector( 4 DOWNTO 0 );
+          clockTree         : IN  std_logic_vector( 4 DOWNTO 0 );
           reset             : IN  std_logic;
           b_hab             : OUT std_logic;
           inicio_out        : OUT std_logic;

@@ -19,10 +19,9 @@ sintetizado no **Quartus Prime** para a família **Cyclone V**.
 ## Sobre o projeto
 
 Este repositório contém um **multiplicador sequencial de 4×4 bits** que produz um
-produto de 8 bits. O circuito foi montado no **Logisim** e exportado para VHDL
-(os arquivos carregam a marcação `logisim*` gerada automaticamente). O VHDL foi
-então compilado no **Quartus Prime 25.1 Standard/Lite** para um dispositivo
-**Cyclone V `5CSXFC6D6F31C8ES`**.
+produto de 8 bits. O circuito foi montado no **Logisim** e exportado para VHDL.
+O VHDL foi então compilado no **Quartus Prime 25.1 Standard/Lite** para um
+dispositivo **Cyclone V `5CSXFC6D6F31C8ES`**.
 
 O projeto segue a divisão clássica de um sistema digital sequencial:
 
@@ -65,8 +64,8 @@ O projeto segue a divisão clássica de um sistema digital sequencial:
 | `entA[3:0]`               | IN   | 4       | Multiplicador (conta decrescente no registrador B).    |
 | `entB[3:0]`               | IN   | 4       | Multiplicando (somado repetidamente no registrador A). |
 | `inicio`                  | IN   | 1       | Sinal de partida da multiplicação.                     |
-| `logisimInputBubbles[0]`  | IN   | 1       | Reset do sistema (botão).                              |
-| `logisimClockTree0[4:0]`  | IN   | 5       | Árvore de clock gerada automaticamente pelo Logisim.   |
+| `reset[0]`               | IN   | 1       | Reset do sistema (botão).                              |
+| `clockTree[4:0]`         | IN   | 5       | Árvore de clock (bit 4 é o clock real do circuito).    |
 | `mult[7:0]`               | OUT  | 8       | Produto `entA × entB`.                                 |
 
 > **Nota:** o cruzamento das entradas no topo é intencional — `entA` alimenta o
@@ -107,7 +106,7 @@ A ordem de bordas do circuito exige um pequeno protocolo no acionamento
 datapath na de **subida**):
 
 1. Mantenha `inicio = 1` (estável).
-2. Aplique o reset (`logisimInputBubbles[0] = 1`) e solte; o reset é
+2. Aplique o reset (`reset[0] = 1`) e solte; o reset é
    assíncrono no botão e sincronizado dentro do circuito para garantir que a
    carga dos operandos ocorra antes de a FSM amostrar o estado.
 3. Aguarde alguns ciclos de clock (pior caso: `2 × entA + 6` ciclos).
@@ -128,16 +127,12 @@ datapath na de **subida**):
 ├── filelist.txt                        # Lista de arquivos do fluxo
 ├── sim/                                # Testbench GHDL (tb_main.vhd, run_ghdl.sh, logs)
 ├── main/
-│   ├── vhdl/
-│   │   ├── circuit/                    # main, bloco_ctr, bloco_op, log_comb  (o design)
-│   │   ├── gates/                      # AND, AND_3, OR
-│   │   ├── arith/                      # Adder, Comparator
-│   │   ├── plexers/                    # Multiplexer_bus_2, Demultiplexer_bus_2
-│   │   ├── memory/                     # REGISTER_FLIP_FLOP
-│   │   ├── base/                       # Geradores de clock do Logisim
-│   │   └── toplevel/                   # logisimTopLevelShell
-│   └── scripts/
-│       └── AlteraDownload.tcl          # Script de download/programação
+│   └── vhdl/
+│       ├── circuit/                    # main, bloco_ctr, bloco_op, log_comb  (o design)
+│       ├── gates/                      # AND, AND_3, OR
+│       ├── arith/                      # Adder, Comparator
+│       ├── plexers/                    # Multiplexer_bus_2, Demultiplexer_bus_2
+│       └── memory/                     # REGISTER_FLIP_FLOP
 ├── simulation/                         # Artefatos de simulação (gerados)
 ├── output_files/                       # Saída do build (.sof, relatórios) — gerado
 └── db/, incremental_db/                # Bancos intermediários do Quartus — gerado
@@ -171,7 +166,7 @@ Resumo reportado pelo Fitter (`output_files/Multiplicador.fit.summary`):
 - **Família:** Cyclone V
 - **Dispositivo:** `5CSXFC6D6F31C8ES`
 
-### Timing (`Multiplicador.sdc`, clock de 50 MHz / 20 ns em `logisimClockTree0[4]`)
+### Timing (`Multiplicador.sdc`, clock de 50 MHz / 20 ns em `clockTree[4]`)
 
 | Análise (pior caso, Slow 1100 mV 85 °C) | Slack      |
 | --------------------------------------- | ---------- |
@@ -190,9 +185,6 @@ Todas as análises fecham com slack positivo (antes da otimização o setup era
   `mult`, `reset`) possui `set_location_assignment`. O `.qsf` contém apenas o
   pinout do template `golden_top.v`, que **não** faz parte deste design. É preciso
   mapear as portas para chaves (`SW`) e LEDs da placa.
-- **Arquivos do Logisim fora da hierarquia:** `logisimTopLevelShell`,
-  geradores de clock e tick do Logisim estão no `.qsf` mas não são instanciados
-  pelo topo `main` (o clock real é `logisimClockTree0[4]`, um pino externo).
 
 ## Verificação funcional
 

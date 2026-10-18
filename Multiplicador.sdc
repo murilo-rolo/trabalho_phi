@@ -1,8 +1,8 @@
 # Multiplicador 4x4 - restricoes de tempo
-# Clock real do circuito: logisimClockTree0(4) (registradores e FSM)
+# Clock real do circuito: clockTree(4) (registradores e FSM)
 # Frequencia de projeto: 50 MHz (periodo 20 ns)
 
-create_clock -name clk_main -period 20.000 [get_ports {logisimClockTree0[4]}]
+create_clock -name clk_main -period 20.000 [get_ports {clockTree[4]}]
 
 # Entradas assincronas em relacao ao clock: nao ha caminho sincrono
 # de tempo critico para elas (operandos estaveis antes do pulso de reset;
@@ -10,7 +10,7 @@ create_clock -name clk_main -period 20.000 [get_ports {logisimClockTree0[4]}]
 set_false_path -from [get_ports {entA[*]}]
 set_false_path -from [get_ports {entB[*]}]
 set_false_path -from [get_ports {inicio}]
-set_false_path -from [get_ports {logisimInputBubbles[0]}]
+set_false_path -from [get_ports {reset[0]}]
 
 # Saidas (mult) sao estaveis apos o fim da operacao: sem requisito de
 # tempo de saida relativamente ao clock

@@ -15,7 +15,7 @@ ENTITY bloco_op IS
           entA              : IN  std_logic_vector( 3 DOWNTO 0 );
           entB              : IN  std_logic_vector( 3 DOWNTO 0 );
           inicio            : IN  std_logic;
-          logisimClockTree0 : IN  std_logic_vector( 4 DOWNTO 0 );
+          clockTree         : IN  std_logic_vector( 4 DOWNTO 0 );
           op_sel            : IN  std_logic;
           reset             : IN  std_logic;
           ab_0              : OUT std_logic;
