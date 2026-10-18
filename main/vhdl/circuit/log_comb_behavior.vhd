@@ -9,13 +9,6 @@ ARCHITECTURE platformIndependent OF log_comb IS
    -- Here all used components are defined                                    --
    -----------------------------------------------------------------------------
 
-      COMPONENT OR_GATE
-         GENERIC ( BubblesMask : std_logic_vector );
-         PORT ( input1 : IN  std_logic;
-                input2 : IN  std_logic;
-                result : OUT std_logic );
-      END COMPONENT;
-
       COMPONENT AND_GATE
          GENERIC ( BubblesMask : std_logic_vector );
          PORT ( input1 : IN  std_logic;
@@ -28,6 +21,13 @@ ARCHITECTURE platformIndependent OF log_comb IS
          PORT ( input1 : IN  std_logic;
                 input2 : IN  std_logic;
                 input3 : IN  std_logic;
+                result : OUT std_logic );
+      END COMPONENT;
+
+      COMPONENT OR_GATE
+         GENERIC ( BubblesMask : std_logic_vector );
+         PORT ( input1 : IN  std_logic;
+                input2 : IN  std_logic;
                 result : OUT std_logic );
       END COMPONENT;
 
@@ -66,8 +66,8 @@ BEGIN
    --------------------------------------------------------------------------------
    -- Here all output connections are defined                                    --
    --------------------------------------------------------------------------------
-   b_hab      <= s_logisimNet12;
-   inicio_out <= s_logisimNet11;
+   b_hab      <= s_logisimNet11;
+   inicio_out <= s_logisimNet12;
    op_sel     <= s_logisimNet17;
 
    --------------------------------------------------------------------------------
@@ -75,16 +75,13 @@ BEGIN
    --------------------------------------------------------------------------------
 
    -- Porta NOT
-   s_logisimNet14 <=  NOT s_logisimNet0;
-
-   -- Porta NOT
    s_logisimNet6 <=  NOT s_logisimNet0;
 
    -- Porta NOT
-   s_logisimNet15 <=  NOT s_logisimNet1;
+   s_logisimNet14 <=  NOT s_logisimNet1;
 
    -- Porta NOT
-   s_logisimNet16 <=  NOT s_logisimNet4;
+   s_logisimNet15 <=  NOT s_logisimNet4;
 
    -- Porta NOT
    s_logisimNet8 <=  NOT s_logisimNet0;
@@ -95,52 +92,55 @@ BEGIN
    -- Porta NOT
    s_logisimNet5 <=  NOT s_logisimNet0;
 
+   -- Porta NOT
+   s_logisimNet16 <=  NOT s_logisimNet0;
+
    --------------------------------------------------------------------------------
    -- Here all normal components are defined                                     --
    --------------------------------------------------------------------------------
-   GATES_1 : OR_GATE
-      GENERIC MAP ( BubblesMask => "00" )
-      PORT MAP ( input1 => s_logisimNet2,
-                 input2 => s_logisimNet9,
-                 result => s_logisimNet11 );
-
-   GATES_2 : AND_GATE
+   GATES_1 : AND_GATE
       GENERIC MAP ( BubblesMask => "00" )
       PORT MAP ( input1 => s_logisimNet14,
                  input2 => s_logisimNet13,
                  result => s_logisimNet2 );
 
-   GATES_3 : AND_GATE
-      GENERIC MAP ( BubblesMask => "00" )
-      PORT MAP ( input1 => s_logisimNet1,
-                 input2 => s_logisimNet6,
-                 result => s_logisimNet9 );
-
-   GATES_4 : OR_GATE
-      GENERIC MAP ( BubblesMask => "00" )
-      PORT MAP ( input1 => s_logisimNet3,
-                 input2 => s_logisimNet10,
-                 result => s_logisimNet12 );
-
-   GATES_5 : AND_GATE
-      GENERIC MAP ( BubblesMask => "00" )
-      PORT MAP ( input1 => s_logisimNet15,
-                 input2 => s_logisimNet13,
-                 result => s_logisimNet3 );
-
-   GATES_6 : AND_GATE_3_INPUTS
+   GATES_2 : AND_GATE_3_INPUTS
       GENERIC MAP ( BubblesMask => "000" )
       PORT MAP ( input1 => s_logisimNet1,
-                 input2 => s_logisimNet16,
+                 input2 => s_logisimNet15,
                  input3 => s_logisimNet8,
-                 result => s_logisimNet10 );
+                 result => s_logisimNet9 );
 
-   GATES_7 : AND_GATE_3_INPUTS
+   GATES_3 : AND_GATE_3_INPUTS
       GENERIC MAP ( BubblesMask => "000" )
       PORT MAP ( input1 => s_logisimNet1,
                  input2 => s_logisimNet7,
                  input3 => s_logisimNet5,
                  result => s_logisimNet17 );
+
+   GATES_4 : AND_GATE
+      GENERIC MAP ( BubblesMask => "00" )
+      PORT MAP ( input1 => s_logisimNet16,
+                 input2 => s_logisimNet13,
+                 result => s_logisimNet3 );
+
+   GATES_5 : AND_GATE
+      GENERIC MAP ( BubblesMask => "00" )
+      PORT MAP ( input1 => s_logisimNet1,
+                 input2 => s_logisimNet6,
+                 result => s_logisimNet10 );
+
+   GATES_6 : OR_GATE
+      GENERIC MAP ( BubblesMask => "00" )
+      PORT MAP ( input1 => s_logisimNet2,
+                 input2 => s_logisimNet9,
+                 result => s_logisimNet11 );
+
+   GATES_7 : OR_GATE
+      GENERIC MAP ( BubblesMask => "00" )
+      PORT MAP ( input1 => s_logisimNet3,
+                 input2 => s_logisimNet10,
+                 result => s_logisimNet12 );
 
 
 END platformIndependent;

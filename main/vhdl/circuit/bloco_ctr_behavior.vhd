@@ -55,8 +55,8 @@ BEGIN
    --------------------------------------------------------------------------------
    s_logisimBus1(2) <= ab_0;
    s_logisimNet3    <= clk;
-   s_logisimNet4    <= inicio;
-   s_logisimNet5    <= reset;
+   s_logisimNet4    <= reset;
+   s_logisimNet5    <= inicio;
 
    --------------------------------------------------------------------------------
    -- Here all output connections are defined                                    --
@@ -77,14 +77,14 @@ BEGIN
    -- Here all normal components are defined                                     --
    --------------------------------------------------------------------------------
    MEMORY_1 : REGISTER_FLIP_FLOP
-      GENERIC MAP ( invertClock => 0,
+      GENERIC MAP ( invertClock => 1,
                     nrOfBits    => 3 )
       PORT MAP ( clock       => logisimClockTree0(4),
                  clockEnable => s_logisimNet8,
                  d           => s_logisimBus1(2 DOWNTO 0),
                  q           => s_logisimBus0(2 DOWNTO 0),
-                 reset       => s_logisimNet5,
-                 tick        => logisimClockTree0(2) );
+                 reset       => s_logisimNet4,
+                 tick        => logisimClockTree0(3) );
 
 
    --------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ BEGIN
    FSM : log_comb
       PORT MAP ( ab_0              => s_logisimBus0(2),
                  b_hab             => s_logisimBus1(1),
-                 inicio            => s_logisimNet4,
+                 inicio            => s_logisimNet5,
                  inicio_out        => s_logisimBus1(0),
                  logisimClockTree0 => logisimClockTree0,
                  op_sel            => s_logisimNet7,

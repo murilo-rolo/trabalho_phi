@@ -78,24 +78,24 @@ BEGIN
    --------------------------------------------------------------------------------
 
    BC : bloco_ctr
-      PORT MAP ( ab_0              => s_logisimNet5,
-                 b_hab             => s_logisimNet4,
+      PORT MAP ( ab_0              => s_logisimNet7,
+                 b_hab             => s_logisimNet5,
                  clk               => s_logisimNet0,
                  inicio            => s_logisimNet2,
-                 inicio_out        => s_logisimNet6,
+                 inicio_out        => s_logisimNet4,
                  logisimClockTree0 => logisimClockTree0,
-                 op_sel            => s_logisimNet7,
+                 op_sel            => s_logisimNet6,
                  reset             => s_logisimNet1 );
 
    BO : bloco_op
-      PORT MAP ( ab_0              => s_logisimNet5,
-                 b_hab             => s_logisimNet4,
+      PORT MAP ( ab_0              => s_logisimNet7,
+                 b_hab             => s_logisimNet5,
                  clk               => s_logisimNet0,
                  entA              => s_logisimBus3(3 DOWNTO 0),
                  entB              => s_logisimBus9(3 DOWNTO 0),
-                 inicio            => s_logisimNet6,
+                 inicio            => s_logisimNet4,
                  logisimClockTree0 => logisimClockTree0,
-                 op_sel            => s_logisimNet7,
+                 op_sel            => s_logisimNet6,
                  reset             => s_logisimNet1,
                  resultado         => s_logisimBus8(7 DOWNTO 0) );
 
