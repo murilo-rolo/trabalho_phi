@@ -16,7 +16,7 @@ BEGIN
    q       <= s_currentState;
    s_clock <= clock WHEN invertClock = 0 ELSE NOT(clock);
 
-   makeMemory : PROCESS(s_clock, reset, clockEnable, tick, d) IS
+   makeMemory : PROCESS(s_clock, reset) IS
    BEGIN
       IF (reset = '1') THEN s_currentState <= (OTHERS => '0');
    ELSIF (rising_Edge(s_clock)) THEN

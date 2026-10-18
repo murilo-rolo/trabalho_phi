@@ -1,27 +1,20 @@
 --==============================================================================
 --== Projeto    : trabalho_phi                                                ==
 --== Componente : bloco_op                                                    ==
+--== Descricao  : Datapath do multiplicador por soma repetida.                 ==
+--==   Registrador A (4 bits): multiplicando, carregado em inicio              ==
+--==   Registrador B (4 bits): multiplicador, conta decrescente ate 0          ==
+--==   Registrador P (8 bits): acumulador do produto                           ==
+--==   op_sel=0: P <- A + P (soma); op_sel=1: B <- B - 1 (contagem)           ==
 --==============================================================================
 
-ARCHITECTURE platformIndependent OF bloco_op IS 
+USE work.all;
+
+ARCHITECTURE platformIndependent OF bloco_op IS
 
    -----------------------------------------------------------------------------
    -- Here all used components are defined                                    --
    -----------------------------------------------------------------------------
-
-      COMPONENT OR_GATE
-         GENERIC ( BubblesMask : std_logic_vector );
-         PORT ( input1 : IN  std_logic;
-                input2 : IN  std_logic;
-                result : OUT std_logic );
-      END COMPONENT;
-
-      COMPONENT AND_GATE
-         GENERIC ( BubblesMask : std_logic_vector );
-         PORT ( input1 : IN  std_logic;
-                input2 : IN  std_logic;
-                result : OUT std_logic );
-      END COMPONENT;
 
       COMPONENT Multiplexer_bus_2
          GENERIC ( nrOfBits : INTEGER );
@@ -75,207 +68,165 @@ ARCHITECTURE platformIndependent OF bloco_op IS
 --------------------------------------------------------------------------------
 -- All used signals are defined here                                          --
 --------------------------------------------------------------------------------
-   SIGNAL s_logisimBus0  : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus1  : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus10 : std_logic_vector( 3 DOWNTO 0 );
-   SIGNAL s_logisimBus12 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus13 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus14 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus15 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus18 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus20 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus23 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus26 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus27 : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus5  : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus6  : std_logic_vector( 3 DOWNTO 0 );
-   SIGNAL s_logisimBus7  : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimBus9  : std_logic_vector( 7 DOWNTO 0 );
-   SIGNAL s_logisimNet11 : std_logic;
-   SIGNAL s_logisimNet16 : std_logic;
-   SIGNAL s_logisimNet17 : std_logic;
-   SIGNAL s_logisimNet19 : std_logic;
-   SIGNAL s_logisimNet2  : std_logic;
-   SIGNAL s_logisimNet21 : std_logic;
-   SIGNAL s_logisimNet22 : std_logic;
-   SIGNAL s_logisimNet24 : std_logic;
-   SIGNAL s_logisimNet25 : std_logic;
-   SIGNAL s_logisimNet3  : std_logic;
-   SIGNAL s_logisimNet4  : std_logic;
-   SIGNAL s_logisimNet8  : std_logic;
+   -- Registradores
+   SIGNAL s_reg_a     : std_logic_vector( 3 DOWNTO 0 );
+   SIGNAL s_reg_b     : std_logic_vector( 3 DOWNTO 0 );
+   SIGNAL s_reg_p     : std_logic_vector( 7 DOWNTO 0 );
+   SIGNAL s_reg_b_d   : std_logic_vector( 3 DOWNTO 0 );
+
+   -- Caminho do somador (8 bits)
+   SIGNAL s_reg_a_ext : std_logic_vector( 7 DOWNTO 0 );
+   SIGNAL s_reg_b_ext : std_logic_vector( 7 DOWNTO 0 );
+   SIGNAL s_add_data_a : std_logic_vector( 7 DOWNTO 0 );
+   SIGNAL s_add_data_b : std_logic_vector( 7 DOWNTO 0 );
+   SIGNAL s_sum        : std_logic_vector( 7 DOWNTO 0 );
+   SIGNAL s_sum_to_b   : std_logic_vector( 7 DOWNTO 0 );
+   SIGNAL s_sum_to_p   : std_logic_vector( 7 DOWNTO 0 );
+
+   -- Controle
+   SIGNAL s_b_hab    : std_logic;
+   SIGNAL s_op_sel   : std_logic;
+   SIGNAL s_n_b_hab  : std_logic;
+   SIGNAL s_n_op_sel : std_logic;
+   SIGNAL s_a_zero   : std_logic;
+   SIGNAL s_b_zero   : std_logic;
+   SIGNAL s_ab_0     : std_logic;
+   SIGNAL s_en_b     : std_logic;
+   SIGNAL s_en_p     : std_logic;
+
+   -- Constantes
+   SIGNAL c_zeros_4 : std_logic_vector( 3 DOWNTO 0 );
+   SIGNAL c_ones_8  : std_logic_vector( 7 DOWNTO 0 );
 
 BEGIN
 
    --------------------------------------------------------------------------------
-   -- Here all input connections are defined                                     --
-   --------------------------------------------------------------------------------
-   s_logisimBus10(3 DOWNTO 0) <= entA;
-   s_logisimBus6(3 DOWNTO 0)  <= entB;
-   s_logisimNet17             <= b_hab;
-   s_logisimNet21             <= op_sel;
-   s_logisimNet22             <= reset;
-   s_logisimNet24             <= clk;
-   s_logisimNet25             <= inicio;
-
-   --------------------------------------------------------------------------------
    -- Here all output connections are defined                                    --
    --------------------------------------------------------------------------------
-   ab_0      <= s_logisimNet16;
-   resultado <= s_logisimBus1(7 DOWNTO 0);
+   ab_0      <= s_ab_0;
+   resultado <= s_reg_p;
 
    --------------------------------------------------------------------------------
-   -- Here all in-lined components are defined                                   --
+   -- Constants and inline logic                                                 --
    --------------------------------------------------------------------------------
+   c_zeros_4 <= "0000";
+   c_ones_8  <= X"FF";
 
-   -- Constante
-    s_logisimBus15(7 DOWNTO 0)  <=  X"00";
+   s_b_hab    <= b_hab;
+   s_op_sel   <= op_sel;
+   s_n_b_hab  <= NOT s_b_hab;
+   s_n_op_sel <= NOT s_op_sel;
 
+   -- ab_0 = (A = 0) or (B = 0): produto zerado, FSM entra em repouso
+   s_ab_0     <= s_a_zero OR s_b_zero;
 
-   -- Constante
-    s_logisimBus27(7 DOWNTO 0)  <=  X"00";
+   -- Enables dos registradores (derivados da FSM)
+   s_en_b     <= inicio AND s_b_hab;
+   s_en_p     <= inicio AND s_n_b_hab;
 
-
-   -- Constante
-    s_logisimBus12(7 DOWNTO 0)  <=  X"FF";
-
-
-   -- Porta NOT
-   s_logisimNet11 <=  NOT s_logisimNet17;
-
-   -- Porta NOT
-   s_logisimNet8 <=  NOT s_logisimNet21;
-
-   -- Extensor de bits
-    s_logisimBus0(0)  <=  s_logisimBus10(0);
-    s_logisimBus0(1)  <=  s_logisimBus10(1);
-    s_logisimBus0(2)  <=  s_logisimBus10(2);
-    s_logisimBus0(3)  <=  s_logisimBus10(3);
-    s_logisimBus0(4)  <=  s_logisimBus10(3);
-    s_logisimBus0(5)  <=  s_logisimBus10(3);
-    s_logisimBus0(6)  <=  s_logisimBus10(3);
-    s_logisimBus0(7)  <=  s_logisimBus10(3);
-
-
-   -- Extensor de bits
-    s_logisimBus13(0)  <=  s_logisimBus6(0);
-    s_logisimBus13(1)  <=  s_logisimBus6(1);
-    s_logisimBus13(2)  <=  s_logisimBus6(2);
-    s_logisimBus13(3)  <=  s_logisimBus6(3);
-    s_logisimBus13(4)  <=  s_logisimBus6(3);
-    s_logisimBus13(5)  <=  s_logisimBus6(3);
-    s_logisimBus13(6)  <=  s_logisimBus6(3);
-    s_logisimBus13(7)  <=  s_logisimBus6(3);
-
+   -- Extensao de A e B (4 bits, sem sinal) para o somador de 8 bits
+   s_reg_a_ext <= std_logic_vector(resize(unsigned(s_reg_a), 8));
+   s_reg_b_ext <= std_logic_vector(resize(unsigned(s_reg_b), 8));
 
    --------------------------------------------------------------------------------
    -- Here all normal components are defined                                     --
    --------------------------------------------------------------------------------
-   GATES_1 : OR_GATE
-      GENERIC MAP ( BubblesMask => "00" )
-      PORT MAP ( input1 => s_logisimNet2,
-                 input2 => s_logisimNet3,
-                 result => s_logisimNet16 );
 
-   GATES_2 : AND_GATE
-      GENERIC MAP ( BubblesMask => "00" )
-      PORT MAP ( input1 => s_logisimNet25,
-                 input2 => s_logisimNet17,
-                 result => s_logisimNet19 );
-
-   GATES_3 : AND_GATE
-      GENERIC MAP ( BubblesMask => "00" )
-      PORT MAP ( input1 => s_logisimNet25,
-                 input2 => s_logisimNet11,
-                 result => s_logisimNet4 );
-
-   PLEXERS_4 : Multiplexer_bus_2
+   -- Selecao dos operandos do somador:
+   --   op_sel=0 (soma): A + P ;  op_sel=1 (contagem): B + 0xFF (= B - 1)
+   MUX_ADD_A : Multiplexer_bus_2
       GENERIC MAP ( nrOfBits => 8 )
       PORT MAP ( enable  => '1',
-                 muxIn_0 => s_logisimBus14(7 DOWNTO 0),
-                 muxIn_1 => s_logisimBus26(7 DOWNTO 0),
-                 muxOut  => s_logisimBus9(7 DOWNTO 0),
-                 sel     => s_logisimNet21 );
+                 muxIn_0 => s_reg_a_ext,
+                 muxIn_1 => s_reg_b_ext,
+                 muxOut  => s_add_data_a,
+                 sel     => s_op_sel );
 
-   PLEXERS_5 : Multiplexer_bus_2
+   MUX_ADD_B : Multiplexer_bus_2
       GENERIC MAP ( nrOfBits => 8 )
       PORT MAP ( enable  => '1',
-                 muxIn_0 => s_logisimBus1(7 DOWNTO 0),
-                 muxIn_1 => s_logisimBus12(7 DOWNTO 0),
-                 muxOut  => s_logisimBus18(7 DOWNTO 0),
-                 sel     => s_logisimNet21 );
+                 muxIn_0 => s_reg_p,
+                 muxIn_1 => c_ones_8,
+                 muxOut  => s_add_data_b,
+                 sel     => s_op_sel );
 
-   PLEXERS_6 : Demultiplexer_bus_2
+   -- op_sel=0: soma vai para P; op_sel=1: soma (B - 1) vai para B
+   DEMUX_SUM : Demultiplexer_bus_2
       GENERIC MAP ( nrOfBits => 8 )
-      PORT MAP ( demuxIn    => s_logisimBus23(7 DOWNTO 0),
-                 demuxOut_0 => s_logisimBus5(7 DOWNTO 0),
-                 demuxOut_1 => s_logisimBus7(7 DOWNTO 0),
+      PORT MAP ( demuxIn    => s_sum,
+                 demuxOut_0 => s_sum_to_b,
+                 demuxOut_1 => s_sum_to_p,
                  enable     => '1',
-                 sel        => s_logisimNet8 );
+                 sel        => s_n_op_sel );
 
-   PLEXERS_7 : Multiplexer_bus_2
-      GENERIC MAP ( nrOfBits => 8 )
+   -- Fonte de D do registrador B:
+   --   op_sel=0: carrega o multiplicador da entrada; op_sel=1: carrega B - 1
+   MUX_B_D : Multiplexer_bus_2
+      GENERIC MAP ( nrOfBits => 4 )
       PORT MAP ( enable  => '1',
-                 muxIn_0 => s_logisimBus13(7 DOWNTO 0),
-                 muxIn_1 => s_logisimBus5(7 DOWNTO 0),
-                 muxOut  => s_logisimBus20(7 DOWNTO 0),
-                 sel     => s_logisimNet21 );
+                 muxIn_0 => entB,
+                 muxIn_1 => s_sum_to_b(3 DOWNTO 0),
+                 muxOut  => s_reg_b_d,
+                 sel     => s_op_sel );
 
-   ARITH_8 : Comparator
-      GENERIC MAP ( nrOfBits       => 8,
+   CMP_A_ZERO : Comparator
+      GENERIC MAP ( nrOfBits       => 4,
                     twosComplement => 0 )
-      PORT MAP ( aEqualsB      => s_logisimNet3,
+      PORT MAP ( aEqualsB      => s_a_zero,
                  aGreaterThanB => OPEN,
                  aLessThanB    => OPEN,
-                 dataA         => s_logisimBus14(7 DOWNTO 0),
-                 dataB         => s_logisimBus15(7 DOWNTO 0) );
+                 dataA         => s_reg_a,
+                 dataB         => c_zeros_4 );
 
-   ARITH_9 : Comparator
-      GENERIC MAP ( nrOfBits       => 8,
+   CMP_B_ZERO : Comparator
+      GENERIC MAP ( nrOfBits       => 4,
                     twosComplement => 0 )
-      PORT MAP ( aEqualsB      => s_logisimNet2,
+      PORT MAP ( aEqualsB      => s_b_zero,
                  aGreaterThanB => OPEN,
                  aLessThanB    => OPEN,
-                 dataA         => s_logisimBus26(7 DOWNTO 0),
-                 dataB         => s_logisimBus27(7 DOWNTO 0) );
+                 dataA         => s_reg_b,
+                 dataB         => c_zeros_4 );
 
-   ARITH_10 : Adder
+   ADDER_1 : Adder
       GENERIC MAP ( extendedBits => 9,
                     nrOfBits     => 8 )
       PORT MAP ( carryIn  => '0',
                  carryOut => OPEN,
-                 dataA    => s_logisimBus9(7 DOWNTO 0),
-                 dataB    => s_logisimBus18(7 DOWNTO 0),
-                 result   => s_logisimBus23(7 DOWNTO 0) );
+                 dataA    => s_add_data_a,
+                 dataB    => s_add_data_b,
+                 result   => s_sum );
 
-   A : REGISTER_FLIP_FLOP
+   -- Multiplicando (4 bits): carregado enquanto a FSM indica inicio da conta
+   REG_A : REGISTER_FLIP_FLOP
+      GENERIC MAP ( invertClock => 0,
+                    nrOfBits    => 4 )
+      PORT MAP ( clock       => logisimClockTree0(4),
+                 clockEnable => inicio,
+                 d           => entA,
+                 q           => s_reg_a,
+                 reset       => reset,
+                 tick        => '1' );
+
+   -- Multiplicador (4 bits): conta decrescente ate zero
+   REG_B : REGISTER_FLIP_FLOP
+      GENERIC MAP ( invertClock => 0,
+                    nrOfBits    => 4 )
+      PORT MAP ( clock       => logisimClockTree0(4),
+                 clockEnable => s_en_b,
+                 d           => s_reg_b_d,
+                 q           => s_reg_b,
+                 reset       => reset,
+                 tick        => '1' );
+
+   -- Acumulador (8 bits): recebe A + P a cada passo de soma
+   REG_P : REGISTER_FLIP_FLOP
       GENERIC MAP ( invertClock => 0,
                     nrOfBits    => 8 )
       PORT MAP ( clock       => logisimClockTree0(4),
-                 clockEnable => s_logisimNet25,
-                 d           => s_logisimBus0(7 DOWNTO 0),
-                 q           => s_logisimBus14(7 DOWNTO 0),
-                 reset       => s_logisimNet22,
-                 tick        => logisimClockTree0(2) );
-
-   B : REGISTER_FLIP_FLOP
-      GENERIC MAP ( invertClock => 0,
-                    nrOfBits    => 8 )
-      PORT MAP ( clock       => logisimClockTree0(4),
-                 clockEnable => s_logisimNet19,
-                 d           => s_logisimBus20(7 DOWNTO 0),
-                 q           => s_logisimBus26(7 DOWNTO 0),
-                 reset       => s_logisimNet22,
-                 tick        => logisimClockTree0(2) );
-
-   P : REGISTER_FLIP_FLOP
-      GENERIC MAP ( invertClock => 0,
-                    nrOfBits    => 8 )
-      PORT MAP ( clock       => logisimClockTree0(4),
-                 clockEnable => s_logisimNet4,
-                 d           => s_logisimBus7(7 DOWNTO 0),
-                 q           => s_logisimBus1(7 DOWNTO 0),
-                 reset       => s_logisimNet22,
-                 tick        => logisimClockTree0(2) );
-
+                 clockEnable => s_en_p,
+                 d           => s_sum_to_p,
+                 q           => s_reg_p,
+                 reset       => reset,
+                 tick        => '1' );
 
 END platformIndependent;

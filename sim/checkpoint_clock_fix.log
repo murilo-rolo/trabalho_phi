@@ -1,0 +1,27 @@
+=== Analise GHDL ===
+=== Elaboracao GHDL ===
+=== Simulacao GHDL ===
+../../src/ieee/v93/numeric_std-body.vhdl:1184:7:@0ms:(assertion warning): NUMERIC_STD."<": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1157:7:@0ms:(assertion warning): NUMERIC_STD."<": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1032:7:@0ms:(assertion warning): NUMERIC_STD.">": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1005:7:@0ms:(assertion warning): NUMERIC_STD.">": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1184:7:@0ms:(assertion warning): NUMERIC_STD."<": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1157:7:@0ms:(assertion warning): NUMERIC_STD."<": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1032:7:@0ms:(assertion warning): NUMERIC_STD.">": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1005:7:@0ms:(assertion warning): NUMERIC_STD.">": metavalue detected, returning FALSE
+tb_main.vhd:93:7:@0ms:(report note): === Inicio da simulacao ===
+../../src/ieee/v93/numeric_std-body.vhdl:1005:7:@0ms:(assertion warning): NUMERIC_STD.">": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1032:7:@0ms:(assertion warning): NUMERIC_STD.">": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1157:7:@0ms:(assertion warning): NUMERIC_STD."<": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1184:7:@0ms:(assertion warning): NUMERIC_STD."<": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1005:7:@0ms:(assertion warning): NUMERIC_STD.">": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1032:7:@0ms:(assertion warning): NUMERIC_STD.">": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1157:7:@0ms:(assertion warning): NUMERIC_STD."<": metavalue detected, returning FALSE
+../../src/ieee/v93/numeric_std-body.vhdl:1184:7:@0ms:(assertion warning): NUMERIC_STD."<": metavalue detected, returning FALSE
+tb_main.vhd:84:13:@12080ns:(report note): PASSOU 3x5  -> 3 x 5 = 15
+tb_main.vhd:78:10:@24200ns:(assertion error): FALHOU 9x9  -> 9 x 9 = 49 (esperado 81)
+tb_main.vhd:78:10:@36320ns:(assertion error): FALHOU 15x15-> 15 x 15 = 1 (esperado 225)
+tb_main.vhd:84:13:@48440ns:(report note): PASSOU 0x7  -> 0 x 7 = 0
+tb_main.vhd:84:13:@60560ns:(report note): PASSOU 1x1  -> 1 x 1 = 1
+tb_main.vhd:99:7:@60600ns:(report note): === Fim da simulacao ===
+=== RESULTADO: FALHOU ===

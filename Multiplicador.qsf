@@ -863,3 +863,4 @@ set_instance_assignment -name INPUT_TERMINATION "OCT 100 OHMS" -to pcie_refclk_p
 set_instance_assignment -name INPUT_TERMINATION "OCT 100 OHMS" -to refclk_ql2_p
 set_instance_assignment -name IO_STANDARD "1.5 V" -to clk_25m_fpga
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name SDC_FILE Multiplicador.sdc

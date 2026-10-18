@@ -62,12 +62,17 @@ O projeto segue a divisão clássica de um sistema digital sequencial:
 
 | Porta                     | Dir. | Largura | Descrição                                              |
 | ------------------------- | :--: | :-----: | ------------------------------------------------------ |
-| `entA[3:0]`               | IN   | 4       | Multiplicando.                                         |
-| `entB[3:0]`               | IN   | 4       | Multiplicador.                                         |
+| `entA[3:0]`               | IN   | 4       | Multiplicador (conta decrescente no registrador B).    |
+| `entB[3:0]`               | IN   | 4       | Multiplicando (somado repetidamente no registrador A). |
 | `inicio`                  | IN   | 1       | Sinal de partida da multiplicação.                     |
 | `logisimInputBubbles[0]`  | IN   | 1       | Reset do sistema (botão).                              |
 | `logisimClockTree0[4:0]`  | IN   | 5       | Árvore de clock gerada automaticamente pelo Logisim.   |
 | `mult[7:0]`               | OUT  | 8       | Produto `entA × entB`.                                 |
+
+> **Nota:** o cruzamento das entradas no topo é intencional — `entA` alimenta o
+> registrador **B** (multiplicador, que decrementa até zero) e `entB` alimenta o
+> registrador **A** (multiplicando, acumulado em P). A multiplicação é comutativa;
+> o produto final é sempre `entA × entB`.
 
 ### Máquina de estados
 
@@ -90,10 +95,27 @@ op_sel      = inicio_out · ¬b_hab · ¬ab_0
 1. Em repouso, aguarda `inicio`.
 2. Com `inicio = 1`, os operandos são carregados em A e B.
 3. O datapath acumula o produto em **P (8 bits)** e atualiza o multiplicador,
-   usando o **somador de 8 bits** (com extensão de sinal dos operandos de 4 bits)
-   e os comparadores para detectar o término.
+   usando o **somador de 8 bits** (operandos de 4 bits estendidos **sem sinal**
+   via `resize`) e os comparadores para detectar o término.
 4. Quando **A = 0** ou **B = 0**, `ab_0 = 1` encerra a FSM e o resultado fica
    disponível em `mult`.
+
+### Protocolo de partida
+
+A ordem de bordas do circuito exige um pequeno protocolo no acionamento
+(o registrador de estado da FSM atualiza na borda de **descida** do clock e o
+datapath na de **subida**):
+
+1. Mantenha `inicio = 1` (estável).
+2. Aplique o reset (`logisimInputBubbles[0] = 1`) e solte; o reset é
+   assíncrono no botão e sincronizado dentro do circuito para garantir que a
+   carga dos operandos ocorra antes de a FSM amostrar o estado.
+3. Aguarde alguns ciclos de clock (pior caso: `2 × entA + 6` ciclos).
+4. Leia o produto em `mult[7:0]`.
+
+> Sem `inicio = 1` durante a liberação do reset, a FSM pode amostrar `ab_0 = 1`
+> com os operandos ainda zerados e travar (o estado de repouso fica
+> indistinguível de "multiplicação concluída").
 
 ## Estrutura do repositório
 
@@ -101,8 +123,10 @@ op_sel      = inicio_out · ¬b_hab · ¬ab_0
 .
 ├── Trabalho2.qpf                       # Projeto Quartus (revisão "Multiplicador")
 ├── Multiplicador.qsf                   # Atribuições do projeto (device, arquivos, pinos)
+├── Multiplicador.sdc                   # Restrições de timing (clock de 50 MHz)
 ├── golden_top.v                        # Exemplo de pinout/IO standard (template Altera)
 ├── filelist.txt                        # Lista de arquivos do fluxo
+├── sim/                                # Testbench GHDL (tb_main.vhd, run_ghdl.sh, logs)
 ├── main/
 │   ├── vhdl/
 │   │   ├── circuit/                    # main, bloco_ctr, bloco_op, log_comb  (o design)
@@ -135,8 +159,8 @@ Resumo reportado pelo Fitter (`output_files/Multiplicador.fit.summary`):
 
 | Recurso                    | Uso        | Disponível  | Uso % |
 | -------------------------- | ---------- | ----------- | :---: |
-| ALMs (lógica)              | 13         | 41.910      | < 1 % |
-| Registradores              | 19         | —           | —     |
+| ALMs (lógica)              | 12         | 41.910      | < 1 % |
+| Registradores              | 20         | —           | —     |
 | Pinos                      | 23         | 499         | 5 %   |
 | Blocos de memória          | 0          | 5.662.720   | 0 %   |
 | Blocos DSP                 | 0          | 112         | 0 %   |
@@ -147,19 +171,41 @@ Resumo reportado pelo Fitter (`output_files/Multiplicador.fit.summary`):
 - **Família:** Cyclone V
 - **Dispositivo:** `5CSXFC6D6F31C8ES`
 
+### Timing (`Multiplicador.sdc`, clock de 50 MHz / 20 ns em `logisimClockTree0[4]`)
+
+| Análise (pior caso, Slow 1100 mV 85 °C) | Slack      |
+| --------------------------------------- | ---------- |
+| Setup                                   | **+5,488 ns** |
+| Hold                                    | +0,220 ns  |
+| Recovery                                | +17,867 ns |
+| Removal                                 | +0,751 ns  |
+| Minimum Pulse Width                     | +8,860 ns  |
+
+Todas as análises fecham com slack positivo (antes da otimização o setup era
+**−3,481 ns** e o pulse width **−0,724 ns**).
+
 ## Limitações e próximos passos
 
 - **Pinos não atribuídos:** nenhuma porta do topo (`entA`, `entB`, `inicio`,
   `mult`, `reset`) possui `set_location_assignment`. O `.qsf` contém apenas o
   pinout do template `golden_top.v`, que **não** faz parte deste design. É preciso
   mapear as portas para chaves (`SW`) e LEDs da placa.
-- **Sem restrições de clock (`.sdc`):** o Timing Analyzer reporta *slack*
-  negativo no domínio gerado pelo Logisim (`logisimClockTree0[4]`). Recomenda-se
-  criar um arquivo `.sdc` com `create_clock` adequado.
-- **Código gerado automaticamente:** os nomes `s_logisim*` são produzidos pelo
-  exportador do Logisim; convém revisar/reimplementar para maior legibilidade.
-- **Verificação funcional:** incluir uma *testbench* para validar a FSM e o
-  datapath em simulação (ModelSim/Questa ou GHDL).
+- **Arquivos do Logisim fora da hierarquia:** `logisimTopLevelShell`,
+  geradores de clock e tick do Logisim estão no `.qsf` mas não são instanciados
+  pelo topo `main` (o clock real é `logisimClockTree0[4]`, um pino externo).
+
+## Verificação funcional
+
+Testbench em VHDL (`sim/tb_main.vhd`) executada com **GHDL**:
+
+```bash
+./sim/run_ghdl.sh
+```
+
+Vetores: `3×5=15`, `9×9=81`, `15×15=225`, `0×7=0`, `1×1=1` — todos passam
+(`sim/post_fix_ghdl.log`). Os logs `sim/baseline_ghdl.log` e
+`sim/checkpoint_clock_fix.log` documentam o estado anterior às correções
+(deadlock total no baseline; bug de extensão **com sinal** no checkpoint).
 
 ## Tecnologias
 
