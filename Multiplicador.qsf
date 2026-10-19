@@ -538,6 +538,8 @@ set_global_assignment -name VHDL_FILE main/vhdl/plexers/Demultiplexer_bus_2_beha
 set_global_assignment -name VHDL_FILE main/vhdl/plexers/Demultiplexer_bus_2_entity.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/plexers/Multiplexer_bus_2_behavior.vhd
 set_global_assignment -name VHDL_FILE main/vhdl/plexers/Multiplexer_bus_2_entity.vhd
+set_global_assignment -name SDC_FILE Multiplicador.sdc
+
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
@@ -855,4 +857,3 @@ set_instance_assignment -name INPUT_TERMINATION "OCT 100 OHMS" -to pcie_refclk_p
 set_instance_assignment -name INPUT_TERMINATION "OCT 100 OHMS" -to refclk_ql2_p
 set_instance_assignment -name IO_STANDARD "1.5 V" -to clk_25m_fpga
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
-set_global_assignment -name SDC_FILE Multiplicador.sdc
